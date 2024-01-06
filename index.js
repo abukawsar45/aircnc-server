@@ -45,6 +45,28 @@ async function run() {
       // console.log(result)
       res.send(result)
     })
+ 
+ 
+    app.get('/room/:id', async (req, res) => {
+      const id = req.params.id
+      const query = {
+        _id : new ObjectId(id)
+      }
+      const result = await roomsCollection.findOne(query)
+      // console.log(result)
+      res.send(result)
+    })
+
+     app.get('/users/:email', async (req, res) => {
+      const email = req.params.email
+      const query = {
+        email: email
+      }
+      const result = await usersCollection.findOne(query)
+      // console.log(result)
+      res.send(result)
+    })
+
     // Save user email and role in DB
     app.put('/users/:email', async(req, res)=>{
       const email = req.params.email;
