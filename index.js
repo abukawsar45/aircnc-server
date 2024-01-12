@@ -29,7 +29,8 @@ async function run() {
     const usersCollection = client.db('aircncDb').collection('users')
     const roomsCollection = client.db('aircncDb').collection('rooms')
     const bookingsCollection = client.db('aircncDb').collection('bookings')
-
+    
+    // -----------------POST----------------------------------------
     // post room data
     app.post('/rooms', async (req, res) => {
       const room = req.body
@@ -39,14 +40,23 @@ async function run() {
       res.send(result)
     })
 
+    // bookings
+    app.post('/bookings', async (req, res) => {
+      const booking = req.body;
+      console.log(booking);
+      const result = await bookingsCollection.insertOne(booking);
+      // console.log(result)
+      res.send(result);
+    });
+
+    // -----------------GET----------------------------------------
     // get room data
     app.get('/rooms', async (req, res) => {
       const result = await roomsCollection.find().toArray()
       // console.log(result)
       res.send(result)
     })
- 
- 
+  
     app.get('/room/:id', async (req, res) => {
       const id = req.params.id
       const query = {
@@ -57,6 +67,27 @@ async function run() {
       res.send(result)
     })
 
+    app.get('/rooms/:email', async (req, res) => {
+      const email = req.params.email
+      const query = { 'host.email': email }
+      const result = await roomsCollection.find(query).toArray();
+      console.log(result)
+      res.send(result)
+    })
+
+    app.get('/bookings', async (req, res) => {
+      const email = req.query.email;
+      
+      if (!email)
+      {
+        res.send([])
+      }
+      const query = { 'guest.email': email }
+      const result = await bookingsCollection.find(query).toArray();
+      res.send(result)
+    } )
+
+    // get user
      app.get('/users/:email', async (req, res) => {
       const email = req.params.email
       const query = {
@@ -67,6 +98,8 @@ async function run() {
       res.send(result)
     })
 
+    
+    // -----------------UPDATE----------------------------------------
     // Save user email and role in DB
     app.put('/users/:email', async(req, res)=>{
       const email = req.params.email;
@@ -77,6 +110,40 @@ async function run() {
         $set: user
       }
       const result =await usersCollection.updateOne(query, updateDoc, options )
+      console.log(result)
+      res.send(result)
+    })
+
+    app.patch('/rooms/status/:id', async(req, res)=>{
+      const id = req.params.id;
+      const status = req.body.status;
+      const query = { _id: new ObjectId(id)}
+      const updateDoc = {
+        $set: {
+          booked: status
+        }
+      }
+      const update =await roomsCollection.updateOne(query, updateDoc )
+      console.log(update)
+      res.send(update);
+    })
+
+
+    // -----------------DELETE----------------------------------------
+    app.delete('/rooms/:id', async (req, res) => {
+      const id = req.params.id
+      const query = {
+        _id: ObjectId(id)
+      }
+      const result = await roomsCollection.deleteOne(query)
+      console.log(result)
+      res.send(result)
+    })
+
+    app.delete('/bookings/:id', async (req, res) => {
+      const id = req.params.id
+      const query = {_id: new ObjectId(id)}
+      const result = await bookingsCollection.deleteOne(query)
       console.log(result)
       res.send(result)
     })
