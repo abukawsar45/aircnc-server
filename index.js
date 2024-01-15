@@ -133,7 +133,7 @@ async function run() {
     app.delete('/rooms/:id', async (req, res) => {
       const id = req.params.id
       const query = {
-        _id: ObjectId(id)
+        _id: new ObjectId(id)
       }
       const result = await roomsCollection.deleteOne(query)
       console.log(result)
